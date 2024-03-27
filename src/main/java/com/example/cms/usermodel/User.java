@@ -42,6 +42,8 @@ public class User {
 	
 	@LastModifiedDate
 	private LocalDateTime lastModifiedAt;
+	
+	private boolean deleted;
 
-// Laksmanal@1234
+     
 }
