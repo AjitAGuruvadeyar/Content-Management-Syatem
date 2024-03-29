@@ -10,6 +10,7 @@ import com.example.cms.usermodel.User;
 public interface UserRepository  extends JpaRepository<User, Integer>{
 
 	boolean existsByEmail(String userEmail);
+	
 	Optional<User> findByEmail(String userEmail);
 	
 }
