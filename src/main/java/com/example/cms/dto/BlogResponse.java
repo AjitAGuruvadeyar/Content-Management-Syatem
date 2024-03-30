@@ -26,6 +26,5 @@ public class BlogResponse {
 	private String[] topics;
 	private String about;
 	
-	private List<User> user;
 
 }
