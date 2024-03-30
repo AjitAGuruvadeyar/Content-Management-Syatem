@@ -21,7 +21,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @Service
 public class ContributionPanelImpl implements ContributionPanelService {
-	
+
 	private ContributionPanelRepository contributionPanelRepository;
 
 	private UserRepository userRepository;
@@ -35,44 +35,45 @@ public class ContributionPanelImpl implements ContributionPanelService {
 	@Override
 	public ResponseEntity<ResponseStructure<ContributionPanelResponse>> addContributor(int userId, int panelId) {
 		String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        
+
 		return userRepository.findByEmail(email).map(owner -> {
-			  return contributionPanelRepository.findById(panelId).map(panel -> {
+			return contributionPanelRepository.findById(panelId).map(panel -> {
 				if(!blogRepository.existsByUsersAndContributionPanel(owner, panel))
 					throw new IllagalAccessRequestException("contributor not inserted");
 				return userRepository.findById(userId).map(contributor->{
-					panel.getUser().add(contributor);
+					if(!contributionPanelRepository.existsByUser(contributor))
+						panel.getUser().add(contributor);
 					contributionPanelRepository.save(panel);
-					
+
 					return ResponseEntity.ok(structure
 							.setData(mapToContributeResponse(panel))
 							.setMessage("Contributor inserted")
 							.setStatuscode(HttpStatus.OK.value()));
 				}).orElseThrow(()-> new UserNotFoundByIdException("Contributor not inserted"));
-			 }).orElseThrow(()-> new ContributionPanelNotFindByIdExceptin("contributor not inserted"));
-			 
+			}).orElseThrow(()-> new ContributionPanelNotFindByIdExceptin("contributor not inserted"));
+
 		}).get();
 	}
 
 	@Override
 	public ResponseEntity<ResponseStructure<ContributionPanelResponse>> deleteContributor(int userId, int panelId) {
-		 String email = SecurityContextHolder.getContext().getAuthentication().getName();
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-		 return userRepository.findByEmail(email).map(owner -> {
-			  return contributionPanelRepository.findById(panelId).map(panel -> {
+		return userRepository.findByEmail(email).map(owner -> {
+			return contributionPanelRepository.findById(panelId).map(panel -> {
 				if(!blogRepository.existsByUsersAndContributionPanel(owner, panel))
 					throw new IllagalAccessRequestException("contributor not inserted");
 				return userRepository.findById(userId).map(contributor->{
 					panel.getUser().remove(contributor);
 					contributionPanelRepository.save(panel);
-					
+
 					return ResponseEntity.ok(structure
 							.setData(mapToContributeResponse(panel))
 							.setMessage("Contributor inserted")
 							.setStatuscode(HttpStatus.OK.value()));
 				}).orElseThrow(()-> new UserNotFoundByIdException("Contributor not inserted"));
-			 }).orElseThrow(()-> new ContributionPanelNotFindByIdExceptin("contributor not inserted"));
-			 
+			}).orElseThrow(()-> new ContributionPanelNotFindByIdExceptin("contributor not inserted"));
+
 		}).get();
 	}
 
@@ -81,5 +82,5 @@ public class ContributionPanelImpl implements ContributionPanelService {
 				.users(contributionPanel.getUser())
 				.build();
 	}
-	
+
 }
